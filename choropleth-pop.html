@@ -30,7 +30,7 @@ path {
   pointer-events: none;
 }
 .bubble {
-	fill: red;
+	fill: none;
   fill-opacity: .5;
   stroke: #fff;
   stroke-width: .5px;
@@ -47,8 +47,11 @@ var svg = d3.select("#map").append("svg")
     .attr("height", height);
 var projection = d3.geoAlbersUsa();   
     var path = d3.geoPath(projection);
-var colors = d3.scaleThreshold().domain([0,250,500,1000]).range(d3.schemeBlues[4])
-
+var colors = d3.scaleThreshold().domain([0,1000,5000,10000,25000,50000,100000,500000,1000000]).range(d3.schemeBlues[9])
+var bubbleColors = d3.scaleThreshold().domain([500000,750000,1000000,2000000,3000000, 4000000, 5000000]).range(d3.schemeYlOrRd[7]);
+     var radius = d3.scaleSqrt()
+        .domain([0, 1e6])
+        .range([0, 15]);
     var ratebyID = {};
      queue()
      .defer(d3.json,'https://raw.githubusercontent.com/d3/d3-geo/master/test/data/us-10m.json')
@@ -57,10 +60,14 @@ var colors = d3.scaleThreshold().domain([0,250,500,1000]).range(d3.schemeBlues[4
 
   function ready(error,us,mapper) {
     mapper.forEach(function(d){
-      ratebyID[d["GEOID"]] = + d["POPPT"];
-    });
+        if(d["ZCTA5"] > 00987 && ratebyID[d["GEOID"]]){
+          ratebyID[d["GEOID"]] = +(parseInt(ratebyID[d["GEOID"]]) + parseInt(d["POPPT"]));
+        } else if(d["ZCTA5"] > 00987){
+          ratebyID[d["GEOID"]] = + d["POPPT"];
+        }
+      });
 
-     states = svg.append("g")
+     counties = svg.append("g")
       .attr("class", "counties")
     .selectAll("path")
     .data(topojson.feature(us, us.objects.counties).features)
@@ -68,16 +75,37 @@ var colors = d3.scaleThreshold().domain([0,250,500,1000]).range(d3.schemeBlues[4
       .attr("d", path)
   .attr("fill",function(d,i){
     if(d.id < 10000){
-      console.log("short id is " + d.id);
       d.id = "0" + d.id;
     }
-    if(ratebyID[d.id] !== undefined){
-      console.log("length of id is " + d.id.length);
+    if(ratebyID[d.id]){
       return colors(ratebyID[d.id]);
     } else {
       return colors(0);
     }
   });
+
+    //also add zeroes to items under 10000
+      svg.selectAll("circle")
+      .data(topojson.feature(us, us.objects.counties).features.sort(function(a, b) { return ratebyID[b.id] - ratebyID[a.id]; }))
+        .enter().append("circle")
+      .filter(function(d){
+        if(d.id < 10000){
+          d.id = "0" + d.id;
+          }
+          return ratebyID[d.id] > 1000000;
+        })
+        .attr("class", "bubble")
+        .attr("transform", function(d) { 
+          if(ratebyID[d.id]) {
+            console.log("ratebyID is " + ratebyID[d.id])
+            return "translate(" + path.centroid(d) + ")";
+          }
+        })
+        .attr("fill", function(d) { return bubbleColors(ratebyID[d.id]); })
+        .attr("r", function(d) { if(ratebyID[d.id]) {
+           return radius(ratebyID[d.id]);
+        }
+     });
   }
 </script>
 	</body>
