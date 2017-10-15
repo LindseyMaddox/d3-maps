@@ -1,0 +1,20 @@
+{
+  "name": "maps",
+  "version": "1.0.0",
+  "description": "zip code maps",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.15.4",
+    "path": "^0.12.7",
+    "topojson": "^3.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "keywords": [
+    "maps"
+  ],
+  "author": "Lindsey Maddox",
+  "license": "ISC"
+}

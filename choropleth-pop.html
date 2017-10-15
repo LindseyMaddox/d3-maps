@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Lindsey Maddox</title>
+		  <script src="http://d3js.org/d3.v4.min.js"></script>
+  <script src="http://d3js.org/queue.v1.min.js"></script>
+  <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+	</head>
+	<style>
+path {
+  stroke:gray;
+  stroke-width: 1px;
+}
+ .circle :hover {
+  fill: orange;
+}
+ .states :hover {
+  fill: red;
+}
+
+.state-borders {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 0.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.bubble {
+	fill: red;
+  fill-opacity: .5;
+  stroke: #fff;
+  stroke-width: .5px;
+}
+      
+</style>
+	<body>
+		<div id="map">
+		</div>
+		<script>
+var  width="1000", height="600";
+var svg = d3.select("#map").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+var projection = d3.geoAlbersUsa();   
+    var path = d3.geoPath(projection);
+var colors = d3.scaleThreshold().domain([0,250,500,1000]).range(d3.schemeBlues[4])
+
+    var ratebyID = {};
+     queue()
+     .defer(d3.json,'https://raw.githubusercontent.com/d3/d3-geo/master/test/data/us-10m.json')
+    .defer(d3.csv, "/zip_to_county.csv")
+    .await(ready);
+
+  function ready(error,us,mapper) {
+    mapper.forEach(function(d){
+      ratebyID[d["GEOID"]] = + d["POPPT"];
+    });
+
+     states = svg.append("g")
+      .attr("class", "counties")
+    .selectAll("path")
+    .data(topojson.feature(us, us.objects.counties).features)
+    .enter().append("path")
+      .attr("d", path)
+  .attr("fill",function(d,i){
+    if(d.id < 10000){
+      console.log("short id is " + d.id);
+      d.id = "0" + d.id;
+    }
+    if(ratebyID[d.id] !== undefined){
+      console.log("length of id is " + d.id.length);
+      return colors(ratebyID[d.id]);
+    } else {
+      return colors(0);
+    }
+  });
+  }
+</script>
+	</body>
+</html>
