@@ -6,7 +6,7 @@ var app = express();
 app.use(express.static(path.resolve(__dirname + '/public')));
 
    app.get('/', function(req,res){
-     res.sendFile(path.join(__dirname+'/sandbox.html'));
+     res.sendFile(path.join(__dirname+'/index.html'));
 });
 
       app.get('/choropleth', function(req,res){

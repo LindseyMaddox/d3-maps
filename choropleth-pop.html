@@ -30,7 +30,6 @@ path {
   pointer-events: none;
 }
 .bubble {
-	fill: none;
   fill-opacity: .5;
   stroke: #fff;
   stroke-width: .5px;
@@ -103,7 +102,7 @@ var bubbleColors = d3.scaleThreshold().domain([500000,750000,1000000,2000000,300
         })
         .attr("fill", function(d) { return bubbleColors(ratebyID[d.id]); })
         .attr("r", function(d) { if(ratebyID[d.id]) {
-           return radius(ratebyID[d.id]);
+           return radius(500000)//radius(200);
         }
      });
   }

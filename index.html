@@ -63,12 +63,12 @@ path {
 		    .await(ready);
 
 		function ready(error,us,mapper) {
-		  mapper.forEach(function(d){
+		  	mapper.forEach(function(d){
 		    //Puerto Rico not in map projection
 		    if(d["ZCTA5"] > 00987 && ratebyID[d["GEOID"]]){
-		      ratebyID[d["GEOID"]] = parseInt(ratebyID[d["GEOID"]]) + parseInt(d["POPPT"]);
+		      ratebyID[d["GEOID"]] = +(parseInt(ratebyID[d["GEOID"]]) + parseInt(d["POPPT"]));
 		    } else if(d["ZCTA5"] > 00987){
-		      ratebyID[d["GEOID"]] = + d["POPPT"];
+		    	ratebyID[d["GEOID"]] = + d["POPPT"];
 		    }
 		  });
 
@@ -83,24 +83,25 @@ path {
 		  svg.selectAll("circle")
 			.data(topojson.feature(us, us.objects.counties).features.sort(function(a, b) { return ratebyID[b.id] - ratebyID[a.id]; }))
 		  	.enter().append("circle")
-		  	.filter(function(d){
-		  	  return ratebyID[d.id] > 500000;
+		 	.filter(function(d){
+		 	  if(d.id < 10000){
+		  		d.id = "0" + d.id;
+		  	  }
+		  	  return ratebyID[d.id] > 1000000;
 		  	})
 		  	.attr("class", "bubble")
 		    .attr("transform", function(d) { 
-		      if(d.id < 10000){
-		        d.id = "0" + d.id;
-		  	  }
 		      if(ratebyID[d.id]) {
 		      	return "translate(" + path.centroid(d) + ")";
 		      }
 		    })
-		    .attr("fill", function(d) { return bubbleColors(ratebyID[d.id]); })
+		    .attr("fill", function(d) {  return bubbleColors(ratebyID[d.id]); })
 		    .attr("r", function(d) { if(ratebyID[d.id]) {
 		       return radius(ratebyID[d.id]);
 		    }
 		 });
 		}
+
 </script>
 	</body>
 </html>
