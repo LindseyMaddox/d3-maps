@@ -6,7 +6,7 @@ A sandbox for working with d3 maps based on US census population data.
 
 A choropleth of US county population density with bubbles for high population centers.
 
-![Choropleth with bubbles]('./population_choropleth.png')
+![Choropleth with bubbles](population_choropleth.png)
 
 ## Bubble Map
 
