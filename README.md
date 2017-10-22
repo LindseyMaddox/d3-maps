@@ -12,3 +12,4 @@ A choropleth of US county population density with bubbles for high population ce
 
 A map of all US counties with population over 1M.
 
+![Bubbles only map](bubbles.png)
